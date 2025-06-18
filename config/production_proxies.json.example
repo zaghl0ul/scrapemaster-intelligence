@@ -1,0 +1,40 @@
+{
+  "proxies": [
+    {
+      "url": "http://YOUR_PROXY_IP:PORT",
+      "type": "http",
+      "username": "YOUR_USERNAME",
+      "password": "YOUR_PASSWORD",
+      "location": "US",
+      "provider": "brightdata",
+      "notes": "Premium residential proxy"
+    },
+    {
+      "url": "socks5://YOUR_PROXY_IP:PORT", 
+      "type": "socks5",
+      "username": "YOUR_USERNAME",
+      "password": "YOUR_PASSWORD",
+      "location": "EU",
+      "provider": "oxylabs",
+      "notes": "Datacenter proxy for high-speed scraping"
+    }
+  ],
+  "proxy_providers": {
+    "production_ready": [
+      {
+        "name": "ScraperAPI",
+        "url": "https://www.scraperapi.com",
+        "features": ["Handles JS rendering", "Auto proxy rotation", "99.9% success rate"],
+        "pricing": "Starting at $29/month for 250k requests",
+        "api_endpoint": "http://api.scraperapi.com?api_key=YOUR_KEY&url="
+      },
+      {
+        "name": "Scrapfly",
+        "url": "https://scrapfly.io", 
+        "features": ["Anti-bot bypass", "Screenshot API", "Residential proxies"],
+        "pricing": "Starting at $15/month",
+        "api_endpoint": "https://api.scrapfly.io/scrape"
+      }
+    ]
+  }
+} 
