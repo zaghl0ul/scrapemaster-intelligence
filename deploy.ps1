@@ -404,3 +404,50 @@ function Show-CompletionSummary {
 
 # Execute main deployment
 Start-Deployment
+
+# Railway Deployment Script for ScrapeMaster Intelligence
+
+Write-Host "🚀 Deploying ScrapeMaster to Railway..." -ForegroundColor Green
+
+# Check if Railway CLI is installed
+if (!(Get-Command railway -ErrorAction SilentlyContinue)) {
+    Write-Host "❌ Railway CLI not found. Installing..." -ForegroundColor Yellow
+    npm install -g @railway/cli
+}
+
+# Check if logged in
+Write-Host "📋 Checking Railway login status..." -ForegroundColor Cyan
+railway whoami
+
+if ($LASTEXITCODE -ne 0) {
+    Write-Host "🔐 Please login to Railway:" -ForegroundColor Yellow
+    railway login
+}
+
+# Link to project (if not already linked)
+if (!(Test-Path ".railway")) {
+    Write-Host "🔗 Linking to Railway project..." -ForegroundColor Cyan
+    railway link
+}
+
+# Set environment variables
+Write-Host "⚙️ Setting environment variables..." -ForegroundColor Cyan
+railway variables --set "SCRAPERAPI_KEY=your_scraperapi_key_here"
+railway variables --set "STRIPE_SECRET_KEY=sk_test_your_key"
+railway variables --set "STRIPE_PUBLISHABLE_KEY=pk_test_your_key"
+railway variables --set "APP_SECRET_KEY=your_secret_key_here"
+railway variables --set "ADMIN_EMAIL=strsmichael@gmail.com"
+
+# Deploy
+Write-Host "🚀 Deploying application..." -ForegroundColor Green
+railway up
+
+# Get deployment URL
+Write-Host "🌐 Getting deployment URL..." -ForegroundColor Cyan
+railway open
+
+Write-Host "✅ Deployment complete!" -ForegroundColor Green
+Write-Host "📝 Next steps:" -ForegroundColor Yellow
+Write-Host "1. Update environment variables with real API keys"
+Write-Host "2. Create Stripe payment links"
+Write-Host "3. Start marketing to get customers!"
