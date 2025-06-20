@@ -22,6 +22,13 @@ ScrapeMaster Intelligence is a production-ready web scraping platform designed f
 - **Data Export**: Multiple export formats (CSV, JSON, Excel)
 - **Scheduled Scraping**: Automated scraping with configurable intervals
 
+
+
+https://github.com/user-attachments/assets/139ecb26-126b-4fd2-9b38-347ed4d8eb21
+
+
+  
+
 ## 📋 Prerequisites
 
 - Python 3.8+
