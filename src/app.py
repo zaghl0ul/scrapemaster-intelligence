@@ -46,10 +46,10 @@ except ImportError as e:
     print(f"Failed to import from src.core: {e}")
     # Fall back to relative imports (when running from src directory)
     try:
-    from core.database import DatabaseManager
-    from core.scraper import WebScraper
-    from core.config import get_config
-    from core.models import ScrapingTarget, ScrapedData, Client, PlanType
+        from core.database import DatabaseManager
+        from core.scraper import WebScraper
+        from core.config import get_config
+        from core.models import ScrapingTarget, ScrapedData, Client, PlanType
         print("Successfully imported from core")
     except ImportError as e2:
         print(f"Failed to import from core: {e2}")
@@ -186,14 +186,14 @@ class ScrapeMasterApp:
         if 'revenue_trend' in revenue_data and revenue_data['revenue_trend']:
             revenue_df = pd.DataFrame(revenue_data['revenue_trend'])
             if not revenue_df.empty:
-            fig = px.line(
+                fig = px.line(
                     revenue_df,
-                x='date',
+                    x='date',
                     y='revenue',
-                title='Daily Revenue Trend',
+                    title='Daily Revenue Trend',
                     labels={'revenue': 'Revenue ($)', 'date': 'Date'}
-            )
-            st.plotly_chart(fig, use_container_width=True)
+                )
+                st.plotly_chart(fig, use_container_width=True)
             else:
                 st.info("No revenue data available yet. Start adding clients to see trends!")
         else:
@@ -303,29 +303,29 @@ class ScrapeMasterApp:
                     # Always try to add/update client
                     self.db.add_client(client)
                     
-                        # Create target
-                        target = ScrapingTarget(
-                            name=target_name,
-                            url=target_url,
-                            selectors={
-                                'price': price_selector,
-                                'title': title_selector,
-                                'availability': availability_selector,
-                                'custom': custom_selector
-                            } if custom_selector else {
-                                'price': price_selector,
-                                'title': title_selector,
-                                'availability': availability_selector
-                            },
-                            frequency_hours=frequency,
-                            client_id=client_id,
-                            price_per_month=price
-                        )
-                        
+                    # Create target
+                    target = ScrapingTarget(
+                        name=target_name,
+                        url=target_url,
+                        selectors={
+                            'price': price_selector,
+                            'title': title_selector,
+                            'availability': availability_selector,
+                            'custom': custom_selector
+                        } if custom_selector else {
+                            'price': price_selector,
+                            'title': title_selector,
+                            'availability': availability_selector
+                        },
+                        frequency_hours=frequency,
+                        client_id=client_id,
+                        price_per_month=price
+                    )
+                    
                     if self.db.add_target(target):
-                            st.success(f"✅ Successfully created target '{target_name}'")
-                            st.balloons()
-                        else:
+                        st.success(f"✅ Successfully created target '{target_name}'")
+                        st.balloons()
+                    else:
                         st.error("Failed to create target. A target with this URL may already exist for this client.")
         
         # Display existing targets
@@ -413,7 +413,7 @@ class ScrapeMasterApp:
                                                 (target.id,)
                                             )
                                         st.success(f"Target {target.name} deleted")
-                                            st.rerun()
+                                        st.rerun()
                                 
                                 st.divider()
         else:
@@ -762,14 +762,14 @@ class ScrapeMasterApp:
             if not client_metrics.empty:
                 metrics = client_metrics.iloc[0]
                 
-        report_col1, report_col2 = st.columns(2)
-        
-        with report_col1:
+                report_col1, report_col2 = st.columns(2)
+                
+                with report_col1:
                     st.metric("Targets Monitored", int(metrics['total_targets'] or 0))
                     st.metric("Total Scrapes", int(metrics['total_scrapes'] or 0))
                     st.metric("Changes Detected", int(metrics['changes_detected'] or 0))
-        
-        with report_col2:
+                
+                with report_col2:
                     avg_response = metrics['avg_response_time'] or 0
                     st.metric("Avg Response Time", f"{avg_response:.0f}ms")
                     
