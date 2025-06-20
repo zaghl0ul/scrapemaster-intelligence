@@ -105,11 +105,330 @@ def performance_monitor(func):
 
 # DatabaseManager is imported from src.core.database above
 
+# Add custom CSS styling and helper functions
+def load_custom_css():
+    """Load custom CSS for enhanced styling"""
+    st.markdown("""
+    <style>
+    /* Main theme colors */
+    :root {
+        --primary-color: #667eea;
+        --secondary-color: #764ba2;
+        --success-color: #28a745;
+        --warning-color: #ffc107;
+        --danger-color: #dc3545;
+        --info-color: #17a2b8;
+        --dark-color: #343a40;
+        --light-color: #f8f9fa;
+    }
+    
+    /* Custom header styling */
+    .main-header {
+        background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+        padding: 1.5rem;
+        border-radius: 15px;
+        margin-bottom: 2rem;
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.2);
+    }
+    
+    .main-header h1 {
+        color: white;
+        text-align: center;
+        margin: 0;
+        font-size: 2.5rem;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    }
+    
+    .main-header p {
+        color: rgba(255,255,255,0.9);
+        text-align: center;
+        margin: 0.5rem 0 0 0;
+        font-size: 1.2rem;
+    }
+    
+    /* Enhanced metric cards */
+    .metric-card {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 12px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        border-left: 4px solid var(--primary-color);
+        margin-bottom: 1rem;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    
+    .metric-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    }
+    
+    /* Status badges */
+    .status-badge {
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: bold;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        display: inline-block;
+        margin: 2px;
+    }
+    
+    .status-active {
+        background-color: var(--success-color);
+        color: white;
+    }
+    
+    .status-error {
+        background-color: var(--danger-color);
+        color: white;
+    }
+    
+    .status-paused {
+        background-color: var(--warning-color);
+        color: var(--dark-color);
+    }
+    
+    /* Target cards */
+    .target-card {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        border: 1px solid #e9ecef;
+        transition: all 0.3s ease;
+    }
+    
+    .target-card:hover {
+        box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+        border-color: var(--primary-color);
+    }
+    
+    /* Button enhancements */
+    .stButton > button {
+        border-radius: 8px;
+        border: none;
+        transition: all 0.2s ease;
+        font-weight: 500;
+    }
+    
+    .stButton > button:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    
+    /* Success/Error alerts */
+    .custom-alert {
+        padding: 1rem;
+        border-radius: 8px;
+        margin: 1rem 0;
+        border-left: 4px solid;
+    }
+    
+    .alert-success {
+        background-color: #d4edda;
+        border-color: var(--success-color);
+        color: #155724;
+    }
+    
+    .alert-warning {
+        background-color: #fff3cd;
+        border-color: var(--warning-color);
+        color: #856404;
+    }
+    
+    .alert-error {
+        background-color: #f8d7da;
+        border-color: var(--danger-color);
+        color: #721c24;
+    }
+    
+    /* Sidebar enhancements */
+    .css-1d391kg {
+        background: linear-gradient(180deg, #f8f9fa 0%, #e9ecef 100%);
+    }
+    
+    /* Progress bar styling */
+    .stProgress > div > div {
+        background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+        border-radius: 10px;
+    }
+    
+    /* Form enhancements */
+    .stSelectbox > div > div {
+        border-radius: 8px;
+    }
+    
+    .stTextInput > div > div {
+        border-radius: 8px;
+    }
+    
+    /* Loading spinner customization */
+    .stSpinner > div {
+        border-top-color: var(--primary-color) !important;
+    }
+    
+    /* Expander styling */
+    .streamlit-expanderHeader {
+        background-color: #f8f9fa;
+        border-radius: 8px;
+    }
+    
+    /* Table styling */
+    .dataframe {
+        border-radius: 8px;
+        overflow: hidden;
+    }
+    
+    /* Hide Streamlit branding */
+    #MainMenu {visibility: hidden;}
+    footer {visibility: hidden;}
+    header {visibility: hidden;}
+    </style>
+    """, unsafe_allow_html=True)
+
+def status_badge(status: str) -> str:
+    """Create a styled status badge"""
+    status_classes = {
+        'active': 'status-active',
+        'error': 'status-error', 
+        'paused': 'status-paused'
+    }
+    class_name = status_classes.get(status.lower(), 'status-active')
+    return f'<span class="status-badge {class_name}">{status}</span>'
+
+def custom_metric_card(title: str, value: str, delta: str = None, delta_color: str = "normal"):
+    """Create a custom metric card with enhanced styling"""
+    delta_html = ""
+    if delta:
+        delta_colors = {
+            "normal": "#666",
+            "positive": "var(--success-color)",
+            "negative": "var(--danger-color)"
+        }
+        color = delta_colors.get(delta_color, "#666")
+        delta_html = f'<p style="color: {color}; font-size: 0.9rem; margin: 0.5rem 0 0 0;">{delta}</p>'
+    
+    st.markdown(f"""
+    <div class="metric-card">
+        <h3 style="margin: 0; color: var(--dark-color); font-size: 1.1rem;">{title}</h3>
+        <h2 style="margin: 0.5rem 0; color: var(--primary-color); font-size: 2rem;">{value}</h2>
+        {delta_html}
+    </div>
+    """, unsafe_allow_html=True)
+
+def enhanced_progress_bar(progress: float, text: str = "", color: str = "primary"):
+    """Create an enhanced progress bar with custom styling"""
+    colors = {
+        "primary": "var(--primary-color)",
+        "success": "var(--success-color)",
+        "warning": "var(--warning-color)",
+        "danger": "var(--danger-color)"
+    }
+    
+    bar_color = colors.get(color, colors["primary"])
+    
+    st.markdown(f"""
+    <div style="margin: 1rem 0;">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+            <span style="font-weight: 500;">{text}</span>
+            <span style="color: {bar_color}; font-weight: bold;">{progress:.1f}%</span>
+        </div>
+        <div style="background-color: #e9ecef; border-radius: 10px; height: 8px; overflow: hidden;">
+            <div style="background: linear-gradient(90deg, {bar_color}, {bar_color}); width: {progress}%; height: 100%; border-radius: 10px; transition: width 0.3s ease;"></div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+def success_animation():
+    """Display a success animation"""
+    st.markdown("""
+    <div style="text-align: center; padding: 2rem;">
+        <div style="font-size: 4rem; animation: bounce 1s infinite;">🎉</div>
+        <h3 style="color: var(--success-color); margin-top: 1rem;">Success!</h3>
+    </div>
+    <style>
+    @keyframes bounce {
+        0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+        40% { transform: translateY(-30px); }
+        60% { transform: translateY(-15px); }
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
+def loading_animation(text: str = "Processing..."):
+    """Display a custom loading animation"""
+    st.markdown(f"""
+    <div style="text-align: center; padding: 2rem;">
+        <div style="display: inline-block; width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid var(--primary-color); border-radius: 50%; animation: spin 1s linear infinite;"></div>
+        <p style="margin-top: 1rem; color: var(--primary-color); font-weight: 500;">{text}</p>
+    </div>
+    <style>
+    @keyframes spin {
+        0% {{ transform: rotate(0deg); }}
+        100% {{ transform: rotate(360deg); }}
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
+def create_target_card(target, show_actions: bool = True):
+    """Create an enhanced target card with better styling"""
+    status_html = status_badge(target.status.value)
+    
+    # Determine card border color based on status
+    border_colors = {
+        'active': 'var(--success-color)',
+        'error': 'var(--danger-color)',
+        'paused': 'var(--warning-color)'
+    }
+    border_color = border_colors.get(target.status.value, 'var(--primary-color)')
+    
+    card_html = f"""
+    <div class="target-card" style="border-left: 4px solid {border_color};">
+        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
+            <h4 style="margin: 0; color: var(--dark-color);">🎯 {target.name}</h4>
+            {status_html}
+        </div>
+        <p style="margin: 0.5rem 0; color: #666; font-size: 0.9rem;">
+            🔗 <a href="{target.url}" target="_blank" style="color: var(--primary-color); text-decoration: none;">{target.url[:50]}...</a>
+        </p>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1rem 0;">
+            <div>
+                <small style="color: #666;">Frequency</small>
+                <p style="margin: 0; font-weight: 500;">⏱️ Every {target.frequency_hours} hours</p>
+            </div>
+            <div>
+                <small style="color: #666;">Monthly Value</small>
+                <p style="margin: 0; font-weight: 500; color: var(--success-color);">💰 ${target.price_per_month}/month</p>
+            </div>
+        </div>
+    """
+    
+    if target.last_scraped:
+        card_html += f"""
+        <p style="margin: 0.5rem 0; color: #666; font-size: 0.9rem;">
+            📅 Last scraped: {target.last_scraped.strftime('%Y-%m-%d %H:%M')}
+        </p>
+        """
+    
+    card_html += "</div>"
+    
+    st.markdown(card_html, unsafe_allow_html=True)
+    
+    # Enhanced progress bar for success rate
+    if hasattr(target, 'success_rate'):
+        color = "success" if target.success_rate >= 80 else "warning" if target.success_rate >= 60 else "danger"
+        enhanced_progress_bar(target.success_rate, f"Success Rate: {target.success_rate:.1f}%", color)
+
 class ScrapeMasterApp:
     """Main application class for ScrapeMaster Intelligence Platform"""
     
     def __init__(self):
         """Initialize the application with all required components"""
+        # Load custom CSS first
+        load_custom_css()
+        
         self.db = DatabaseManager()
         
         # Load proxy configuration if enabled
@@ -144,48 +463,70 @@ class ScrapeMasterApp:
     
     def render_executive_dashboard(self):
         """Render the main executive dashboard with key metrics"""
-        st.title("📊 Executive Dashboard")
+        # Custom header
+        st.markdown("""
+        <div class="main-header">
+            <h1>🕷️ ScrapeMaster Intelligence</h1>
+            <p>Enterprise Web Scraping & Competitive Intelligence Platform</p>
+        </div>
+        """, unsafe_allow_html=True)
         
         # Get revenue analytics
         revenue_data = self.db.get_revenue_analytics()
         
-        # Key metrics row
+        # Enhanced key metrics row using custom cards
+        st.subheader("📊 Key Performance Indicators")
         col1, col2, col3, col4 = st.columns(4)
         
         with col1:
-            st.metric(
+            growth_delta = f"+{revenue_data['growth_rate']:.1f}% growth" if revenue_data['growth_rate'] > 0 else f"{revenue_data['growth_rate']:.1f}% growth"
+            delta_color = "positive" if revenue_data['growth_rate'] > 0 else "negative" if revenue_data['growth_rate'] < 0 else "normal"
+            custom_metric_card(
                 "Monthly Recurring Revenue",
                 f"${revenue_data['mrr']:,.0f}",
-                delta=f"{revenue_data['growth_rate']:.1f}% growth"
+                growth_delta,
+                delta_color
             )
         
         with col2:
-            st.metric(
+            enterprise_clients = revenue_data.get('enterprise_clients', 0)
+            delta_text = f"{enterprise_clients} enterprise" if enterprise_clients > 0 else "Growing client base"
+            custom_metric_card(
                 "Active Clients",
-                revenue_data['client_count'],
-                delta=f"{revenue_data.get('enterprise_clients', 0)} enterprise" if revenue_data.get('enterprise_clients', 0) > 0 else None
+                str(revenue_data['client_count']),
+                delta_text,
+                "positive" if enterprise_clients > 0 else "normal"
             )
         
         with col3:
-            st.metric(
-                "Active Targets",
-                revenue_data['target_count'],
-                delta=f"{revenue_data.get('active_targets', revenue_data['target_count'])}/{revenue_data['target_count']} active"
+            active_targets = revenue_data.get('active_targets', revenue_data['target_count'])
+            delta_text = f"{active_targets}/{revenue_data['target_count']} active"
+            custom_metric_card(
+                "Monitoring Targets",
+                str(revenue_data['target_count']),
+                delta_text,
+                "positive"
             )
         
         with col4:
             avg_revenue = revenue_data['mrr'] / max(revenue_data['client_count'], 1)
-            st.metric(
+            success_rate = revenue_data.get('avg_success_rate', 100)
+            delta_text = f"{success_rate:.0f}% success rate"
+            custom_metric_card(
                 "Avg Revenue/Client",
                 f"${avg_revenue:,.0f}",
-                delta=f"{revenue_data.get('avg_success_rate', 100):.0f}% success rate"
+                delta_text,
+                "positive" if success_rate >= 90 else "normal"
             )
         
-        # Revenue chart
-        st.subheader("📈 Revenue Trend")
+        # Enhanced revenue chart with better styling
+        st.markdown("---")
+        st.subheader("📈 Revenue Analytics")
+        
         if 'revenue_trend' in revenue_data and revenue_data['revenue_trend']:
             revenue_df = pd.DataFrame(revenue_data['revenue_trend'])
             if not revenue_df.empty:
+                # Enhanced chart with custom styling
                 fig = px.line(
                     revenue_df,
                     x='date',
@@ -193,13 +534,38 @@ class ScrapeMasterApp:
                     title='Daily Revenue Trend',
                     labels={'revenue': 'Revenue ($)', 'date': 'Date'}
                 )
+                
+                # Customize chart appearance
+                fig.update_traces(
+                    line=dict(color='#667eea', width=3),
+                    fill='tonexty',
+                    fillcolor='rgba(102, 126, 234, 0.1)'
+                )
+                
+                fig.update_layout(
+                    plot_bgcolor='rgba(0,0,0,0)',
+                    paper_bgcolor='rgba(0,0,0,0)',
+                    font=dict(color='#343a40'),
+                    title_font_size=16,
+                    showlegend=False
+                )
+                
                 st.plotly_chart(fig, use_container_width=True)
             else:
-                st.info("No revenue data available yet. Start adding clients to see trends!")
+                st.markdown("""
+                <div class="alert-warning custom-alert">
+                    <strong>📊 Getting Started:</strong> No revenue data available yet. Start adding clients to see trends!
+                </div>
+                """, unsafe_allow_html=True)
         else:
-            st.info("No revenue data available yet. Start adding clients to see trends!")
+            st.markdown("""
+            <div class="alert-warning custom-alert">
+                <strong>📊 Getting Started:</strong> No revenue data available yet. Start adding clients to see trends!
+            </div>
+            """, unsafe_allow_html=True)
         
-        # Recent activity
+        # Enhanced activity sections
+        st.markdown("---")
         col1, col2 = st.columns(2)
         
         with col1:
@@ -207,9 +573,18 @@ class ScrapeMasterApp:
             recent_changes = self.db.get_recent_changes(limit=5)
             if not recent_changes.empty:
                 for _, change in recent_changes.iterrows():
-                    st.write(f"• **{change['target_name']}** - {change['timestamp']}")
+                    st.markdown(f"""
+                    <div style="background: #f8f9fa; padding: 1rem; border-radius: 8px; margin: 0.5rem 0; border-left: 3px solid var(--info-color);">
+                        <strong>{change['target_name']}</strong><br>
+                        <small style="color: #666;">{change['timestamp']}</small>
+                    </div>
+                    """, unsafe_allow_html=True)
             else:
-                st.info("No recent changes detected")
+                st.markdown("""
+                <div class="custom-alert alert-success">
+                    <strong>✅ All Clear:</strong> No recent changes detected. Your targets are stable!
+                </div>
+                """, unsafe_allow_html=True)
         
         with col2:
             st.subheader("⚠️ Targets Requiring Attention")
@@ -224,9 +599,19 @@ class ScrapeMasterApp:
             
             if not error_targets.empty:
                 for _, target in error_targets.iterrows():
-                    st.warning(f"• **{target['name']}** - {target['consecutive_errors']} errors")
+                    error_level = "danger" if target['consecutive_errors'] > 3 else "warning"
+                    st.markdown(f"""
+                    <div class="custom-alert alert-{error_level}">
+                        <strong>{target['name']}</strong><br>
+                        <small>{target['consecutive_errors']} consecutive errors</small>
+                    </div>
+                    """, unsafe_allow_html=True)
             else:
-                st.success("All targets operating normally")
+                st.markdown("""
+                <div class="custom-alert alert-success">
+                    <strong>🎉 Excellent:</strong> All targets operating normally!
+                </div>
+                """, unsafe_allow_html=True)
     
     def render_advanced_target_management(self):
         """Advanced target management interface with bulk operations"""
@@ -553,74 +938,197 @@ class ScrapeMasterApp:
     
     def _execute_bulk_scrape(self, targets: List[ScrapingTarget]):
         """Execute bulk scraping with progress tracking"""
-        progress_bar = st.progress(0, text="Starting bulk scrape...")
+        if not targets:
+            st.warning("No targets to scrape!")
+            return
+            
+        # Enhanced loading animation
+        loading_container = st.empty()
+        with loading_container.container():
+            loading_animation("Initializing bulk scrape...")
+        
+        time.sleep(1)  # Brief pause for UX
+        loading_container.empty()
+        
+        # Progress tracking with enhanced styling
+        progress_container = st.container()
         status_container = st.empty()
         
         successful_scrapes = 0
         failed_scrapes = 0
         changes_detected = 0
         
-        for idx, target in enumerate(targets):
-            progress = (idx + 1) / len(targets)
-            progress_bar.progress(progress, text=f"Scraping {target.name}...")
+        with progress_container:
+            st.subheader("🚀 Bulk Scraping Progress")
             
-            try:
-                result = self.scraper.scrape_target(target)
+            for idx, target in enumerate(targets):
+                progress = ((idx + 1) / len(targets)) * 100
                 
-                if result and result.status_code == 200:
-                    self.db.store_scraped_data(result)
-                    successful_scrapes += 1
+                # Enhanced progress bar
+                enhanced_progress_bar(
+                    progress, 
+                    f"Scraping {target.name}... ({idx + 1}/{len(targets)})",
+                    "primary"
+                )
+                
+                try:
+                    with status_container.container():
+                        st.info(f"🔄 Processing: {target.name}")
                     
-                    if result.change_detected:
-                        changes_detected += 1
-                        status_container.warning(f"🔔 Change detected in {target.name}!")
-                else:
+                    result = self.scraper.scrape_target(target)
+                    
+                    if result and result.status_code == 200:
+                        self.db.store_scraped_data(result)
+                        successful_scrapes += 1
+                        
+                        if result.change_detected:
+                            changes_detected += 1
+                            with status_container.container():
+                                st.markdown(f"""
+                                <div class="custom-alert alert-warning">
+                                    <strong>🔔 Change Detected:</strong> {target.name}
+                                </div>
+                                """, unsafe_allow_html=True)
+                        else:
+                            with status_container.container():
+                                st.markdown(f"""
+                                <div class="custom-alert alert-success">
+                                    <strong>✅ Success:</strong> {target.name}
+                                </div>
+                                """, unsafe_allow_html=True)
+                    else:
+                        failed_scrapes += 1
+                        with status_container.container():
+                            st.markdown(f"""
+                            <div class="custom-alert alert-error">
+                                <strong>❌ Failed:</strong> {target.name}
+                            </div>
+                            """, unsafe_allow_html=True)
+                        
+                except Exception as e:
                     failed_scrapes += 1
-                    status_container.error(f"❌ Failed to scrape {target.name}")
-                    
-            except Exception as e:
-                failed_scrapes += 1
-                status_container.error(f"❌ Error scraping {target.name}: {str(e)}")
-                logger.error(f"Scraping error for {target.name}: {e}")
+                    with status_container.container():
+                        st.markdown(f"""
+                        <div class="custom-alert alert-error">
+                            <strong>❌ Error:</strong> {target.name} - {str(e)[:50]}...
+                        </div>
+                        """, unsafe_allow_html=True)
+                    logger.error(f"Scraping error for {target.name}: {e}")
+                
+                # Small delay for better UX
+                time.sleep(0.5)
         
-        progress_bar.empty()
+        # Clear progress and show final results
+        progress_container.empty()
         status_container.empty()
         
-        # Show summary
+        # Success animation if changes detected
+        if changes_detected > 0:
+            success_animation()
+        
+        # Enhanced summary with custom cards
+        st.subheader("📊 Scraping Summary")
         summary_col1, summary_col2, summary_col3 = st.columns(3)
         
         with summary_col1:
-            st.metric("✅ Successful", successful_scrapes)
+            custom_metric_card(
+                "Successful Scrapes",
+                str(successful_scrapes),
+                f"{(successful_scrapes/len(targets)*100):.1f}% success rate",
+                "positive" if successful_scrapes > 0 else "normal"
+            )
         
         with summary_col2:
-            st.metric("🔔 Changes", changes_detected)
+            custom_metric_card(
+                "Changes Detected",
+                str(changes_detected),
+                "Content updates found" if changes_detected > 0 else "No changes",
+                "positive" if changes_detected > 0 else "normal"
+            )
         
         with summary_col3:
-            st.metric("❌ Failed", failed_scrapes)
-        
-        if changes_detected > 0:
-            st.balloons()
+            custom_metric_card(
+                "Failed Attempts",
+                str(failed_scrapes),
+                f"{(failed_scrapes/len(targets)*100):.1f}% failure rate" if failed_scrapes > 0 else "Perfect run!",
+                "negative" if failed_scrapes > 0 else "positive"
+            )
     
     def _execute_single_scrape(self, target: ScrapingTarget):
         """Execute single target scrape with detailed feedback"""
-        with st.spinner(f"Scraping {target.name}..."):
+        # Enhanced loading state
+        loading_container = st.empty()
+        with loading_container.container():
+            loading_animation(f"Scraping {target.name}...")
+        
+        try:
             result = self.scraper.scrape_target(target)
+            loading_container.empty()
             
             if result:
                 self.db.store_scraped_data(result)
                 
                 if result.status_code == 200:
-                    st.success(f"✅ Successfully scraped {target.name}")
-                    if result.change_detected:
-                        st.warning(f"🔔 Change detected!")
+                    # Success with animation
+                    st.markdown(f"""
+                    <div class="custom-alert alert-success">
+                        <strong>✅ Success!</strong> Successfully scraped {target.name}
+                    </div>
+                    """, unsafe_allow_html=True)
                     
-                    with st.expander("View extracted data"):
-                        st.json(result.data)
-                        st.caption(f"Response time: {result.response_time_ms}ms | Success rate: {result.extraction_success_rate:.1f}%")
+                    if result.change_detected:
+                        st.markdown(f"""
+                        <div class="custom-alert alert-warning">
+                            <strong>🔔 Change Detected!</strong> Content has been updated
+                        </div>
+                        """, unsafe_allow_html=True)
+                        success_animation()
+                    
+                    # Enhanced data display
+                    with st.expander("📊 View Extracted Data", expanded=result.change_detected):
+                        col1, col2 = st.columns(2)
+                        
+                        with col1:
+                            st.json(result.data)
+                        
+                        with col2:
+                            custom_metric_card(
+                                "Response Time",
+                                f"{result.response_time_ms}ms",
+                                "Fast response" if result.response_time_ms < 2000 else "Slow response",
+                                "positive" if result.response_time_ms < 2000 else "warning"
+                            )
+                            
+                            if hasattr(result, 'extraction_success_rate'):
+                                enhanced_progress_bar(
+                                    result.extraction_success_rate,
+                                    "Extraction Success Rate",
+                                    "success" if result.extraction_success_rate >= 80 else "warning"
+                                )
                 else:
-                    st.error(f"❌ Scraping failed: {result.errors}")
+                    st.markdown(f"""
+                    <div class="custom-alert alert-error">
+                        <strong>❌ Scraping Failed</strong><br>
+                        Status Code: {result.status_code}<br>
+                        Errors: {result.errors}
+                    </div>
+                    """, unsafe_allow_html=True)
             else:
-                st.error(f"❌ Critical error scraping {target.name}")
+                st.markdown(f"""
+                <div class="custom-alert alert-error">
+                    <strong>❌ Critical Error</strong><br>
+                    Failed to scrape {target.name}. Please check the target configuration.
+                </div>
+                """, unsafe_allow_html=True)
+                
+        except Exception as e:
+            loading_container.empty()
+            st.markdown(f"""
+            <div class="custom-alert alert-error">
+                <strong>❌ Unexpected Error</strong><br>
+                {str(e)}
+            </div>
+            """, unsafe_allow_html=True)
     
     def render_client_management(self):
         """Advanced client management with CRM features"""
